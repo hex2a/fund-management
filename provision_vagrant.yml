@@ -1,0 +1,17 @@
+---
+- hosts: all
+  become: yes
+  vars:
+    pkgs:
+      - redis-server
+      - python3-pip
+  tasks:
+    - name: add backports repository
+      apt_repository: repo='deb http://http.debian.net/debian jessie-backports main contrib' state=present update_cache=yes
+    - name: install/upgrade Packages
+      apt: name="{{ item }}" state=latest default_release=jessie-backports
+      with_items: "{{ pkgs }}"
+    - name: 'pip: install virtualenv'
+      pip: name=virtualenv executable=pip3
+    - name: 'pip: install requirements into virtualenv'
+      pip: requirements='/vagrant/requirements.txt' virtualenv_python='python3.4' virtualenv='/vagrant/venv'
